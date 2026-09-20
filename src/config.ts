@@ -3,6 +3,9 @@ import os from "os";
 import path from "path";
 
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - types
+
+
 export type Config = {
   dbUrl: string;
   currentUserName?: string;
