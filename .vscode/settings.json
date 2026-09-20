@@ -1,0 +1,7 @@
+{
+  "editor.inlineSuggest.enabled": false,
+  "github.copilot.inlineSuggest.enable": false,
+  "codeium.enable": {
+    "*": false
+  }
+}
