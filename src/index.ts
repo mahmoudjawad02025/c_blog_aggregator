@@ -1,13 +1,16 @@
-import { CommandsRegistry, handlerLogin, runCommand } from "./command";
+import { CommandsRegistry, handlerListUsers, handlerLogin, handlerRegister, handlerReset, runCommand } from "./command";
 import { readConfig, setUser } from "./config";
 
-function main() {
+async function main() {
   // console.log("Hello, world!\n");
   // setUser('Mahmoud')
   // const cfg = readConfig()
   // console.log(cfg);
   const cmdRegistrey: CommandsRegistry = {}
   cmdRegistrey['login'] = handlerLogin
+  cmdRegistrey['register'] = handlerRegister
+  cmdRegistrey['reset'] = handlerReset
+  cmdRegistrey['users'] = handlerListUsers
 
   const args = process.argv.slice(2);
   if(args.length === 0){
@@ -17,8 +20,8 @@ function main() {
     
   const cmd = args[0]
   const cmdArgs = args.slice(1)
-  runCommand(cmdRegistrey, cmd, ...cmdArgs)
-
+  await runCommand(cmdRegistrey, cmd, ...cmdArgs)
+  process.exit(0);
 }
 
 main();
