@@ -1,16 +1,20 @@
-import { CommandsRegistry, handlerListUsers, handlerLogin, handlerRegister, handlerReset, runCommand } from "./command";
+import { CommandsRegistry, handlerAddFeed, handlerAgg, handlerListFeeds, handlerListUsers, handlerLogin, handlerRegister, handlerReset, runCommand } from "./command";
 import { readConfig, setUser } from "./config";
 
+
+import dns from "node:dns";
+dns.setDefaultResultOrder("ipv4first");
+
 async function main() {
-  // console.log("Hello, world!\n");
-  // setUser('Mahmoud')
-  // const cfg = readConfig()
-  // console.log(cfg);
   const cmdRegistrey: CommandsRegistry = {}
   cmdRegistrey['login'] = handlerLogin
   cmdRegistrey['register'] = handlerRegister
   cmdRegistrey['reset'] = handlerReset
   cmdRegistrey['users'] = handlerListUsers
+  cmdRegistrey['agg'] = handlerAgg
+  cmdRegistrey['addfeed'] = handlerAddFeed
+  cmdRegistrey['feeds'] = handlerListFeeds
+
 
   const args = process.argv.slice(2);
   if(args.length === 0){
@@ -18,6 +22,7 @@ async function main() {
     process.exit(1)
   }
     
+
   const cmd = args[0]
   const cmdArgs = args.slice(1)
   await runCommand(cmdRegistrey, cmd, ...cmdArgs)

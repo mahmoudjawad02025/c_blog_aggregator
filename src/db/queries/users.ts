@@ -20,6 +20,12 @@ export async function getUserByName(name: string) {
 }
 
 
+export async function getUserById(id: any) {
+  const [result] = await db.select().from(users).where(eq(users.id, id));
+  return result;
+}
+
+
 export async function clearUsers() {
   const [result] = await db.delete(users).returning();
   return result;
