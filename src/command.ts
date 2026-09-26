@@ -14,6 +14,12 @@ export type CommandHandler =
 
 export type CommandsRegistry = Record<string, CommandHandler>;
 
+export type UserCommandHandler = (
+  cmdName: string,
+  user: User,
+  ...args: string[]
+) => Promise<void>;
+
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - core
 
@@ -60,8 +66,6 @@ export async function handlerRegister(cmdName: string, ...args: string[]){
 
 
 export async function handlerReset(cmdName: string, ...args: string[]){
-    // if(args.length === 0)
-    //     throw new Error("the Reset handler expects a single argument")
     const res = await clearUsers()
     if(res)
         console.log("Users have been cleared!")
@@ -71,8 +75,6 @@ export async function handlerReset(cmdName: string, ...args: string[]){
 
 
 export async function handlerListUsers(cmdName: string, ...args: string[]){
-    // if(args.length === 0)
-    //     throw new Error("the Reset handler expects a single argument")
     const res = await getUsers()
     const config = readConfig()
         
@@ -101,18 +103,9 @@ export async function handlerAgg(cmdName: string, ...args: string[]){
 }
 
 
-export async function handlerAddFeed(cmdName: string, ...args: string[]){
+export async function handlerAddFeed(cmdName: string, user:User, ...args: string[]){
     if(args.length !== 2)
         throw new Error("createfeed expects two arguments: name and url");
-
-    const config = readConfig()
-    if (!config.currentUserName) {
-        throw new Error("User does not exist!");
-    }
-    const user = await getUserByName(config.currentUserName);
-    if (!user) {
-        throw new Error("User not found");
-    }
     
     const feed = await addFeed(args[0], args[1], user.id);
     if (!feed) throw new Error("Feed insert failed");
@@ -141,21 +134,13 @@ export async function handlerListFeeds(cmdName: string, ...args: string[]){
 
 
 
-export async function handlerCreateFeedFollow(cmdName: string, ...args: string[]){
+export async function handlerCreateFeedFollow(cmdName: string, user:User, ...args: string[]){
     if(args.length === 0)
         throw new Error("The handler expects a single argument!")
 
     // feed_id
     const feed = await getFeedByUrl(args[0]);
     const feed_id = feed.id
-
-    // user_id
-    const config = readConfig()
-    if (!config.currentUserName) 
-        throw new Error("User does not exist!");
-    const user = await getUserByName(config.currentUserName);
-    if (!user)
-        throw new Error("User not found");
     const user_id = user.id
 
     // call
@@ -167,18 +152,8 @@ export async function handlerCreateFeedFollow(cmdName: string, ...args: string[]
 }
 
 
-export async function handlerListFeedFollows(cmdName: string, ...args: string[]){
-    // if(args.length === 0)
-    //     throw new Error("the Reset handler expects a single argument")
-    // user_id
-    const config = readConfig()
-    if (!config.currentUserName) 
-        throw new Error("User does not exist!");
-    const user = await getUserByName(config.currentUserName);
-    if (!user)
-        throw new Error("User not found");
+export async function handlerListFeedFollows(cmdName: string, user:User, ...args: string[]){
     const user_id = user.id
-
     const res = await getFeedFollowsForUser(user_id)
         
     if(res)

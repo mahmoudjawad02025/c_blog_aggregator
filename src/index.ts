@@ -3,6 +3,7 @@ import { readConfig, setUser } from "./config";
 
 
 import dns from "node:dns";
+import { middlewareLoggedIn } from "./middleware";
 dns.setDefaultResultOrder("ipv4first");
 
 async function main() {
@@ -12,10 +13,10 @@ async function main() {
   cmdRegistrey['reset'] = handlerReset
   cmdRegistrey['users'] = handlerListUsers
   cmdRegistrey['agg'] = handlerAgg
-  cmdRegistrey['addfeed'] = handlerAddFeed
+  cmdRegistrey['addfeed'] = middlewareLoggedIn(handlerAddFeed)
   cmdRegistrey['feeds'] = handlerListFeeds
-  cmdRegistrey['follow'] = handlerCreateFeedFollow
-  cmdRegistrey['following'] = handlerListFeedFollows
+  cmdRegistrey['follow'] = middlewareLoggedIn(handlerCreateFeedFollow)
+  cmdRegistrey['following'] = middlewareLoggedIn(handlerListFeedFollows)
 
 
   const args = process.argv.slice(2);
