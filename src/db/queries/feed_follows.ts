@@ -31,6 +31,16 @@ export async function getFeedFollowsForUser(user_id:any) {
 }
 
 
+export async function deleteFeedFollow(feed_id:any, user_id:any) {
+    const [result] = await db.delete(feed_follows)
+        .where(and(eq(feed_follows.feed_id, feed_id), eq(feed_follows.user_id, user_id)))
+        .returning();
+    
+    if (!result) throw new Error("Follow not found");
+    return result;
+}
+
+
 export async function getFeedFollowInfo(feed_id:any, user_id:any) {
   const [result] = await db
   .select({

@@ -1,4 +1,4 @@
-import { CommandsRegistry, handlerAddFeed, handlerAgg, handlerCreateFeedFollow, handlerListFeedFollows, handlerListFeeds, handlerListUsers, handlerLogin, handlerRegister, handlerReset, runCommand } from "./command";
+import { CommandsRegistry, handlerAddFeed, handlerAgg, handlerCreateFeedFollow, handlerDeleteFeedFollow, handlerListFeedFollows, handlerListFeeds, handlerListUsers, handlerLogin, handlerRegister, handlerReset, runCommand } from "./command";
 import { readConfig, setUser } from "./config";
 
 
@@ -17,6 +17,7 @@ async function main() {
   cmdRegistrey['feeds'] = handlerListFeeds
   cmdRegistrey['follow'] = middlewareLoggedIn(handlerCreateFeedFollow)
   cmdRegistrey['following'] = middlewareLoggedIn(handlerListFeedFollows)
+  cmdRegistrey['unfollow'] = middlewareLoggedIn(handlerDeleteFeedFollow)
 
 
   const args = process.argv.slice(2);

@@ -1,5 +1,5 @@
 import { readConfig, setUser } from "./config";
-import { createFeedFollow, getFeedFollowsForUser } from "./db/queries/feed_follows";
+import { createFeedFollow, deleteFeedFollow, getFeedFollowsForUser } from "./db/queries/feed_follows";
 import { addFeed, getFeedByUrl, getFeeds } from "./db/queries/feeds";
 import { clearUsers, createUser, getUserById, getUserByName, getUsers } from "./db/queries/users";
 import { Feed, User } from "./db/schema";
@@ -162,6 +162,24 @@ export async function handlerListFeedFollows(cmdName: string, user:User, ...args
         }
     else
         console.log("Something happened, retry later!")
+}
+
+
+export async function handlerDeleteFeedFollow(cmdName: string, user:User, ...args: string[]){
+    if(args.length === 0)
+        throw new Error("The handler expects a single argument!")
+
+    // feed_id
+    const feed = await getFeedByUrl(args[0]);
+    const feed_id = feed.id
+    const user_id = user.id
+
+    // call
+    if(args.length === 0)
+        throw new Error("the handler expects a single argument!")
+    const res = await deleteFeedFollow(feed_id, user_id)
+
+    console.log(`Unfollowed ${feed.name}`);
 }
 
 
