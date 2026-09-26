@@ -3,7 +3,7 @@ import { readConfig, setUser } from "./config";
 
 
 import dns from "node:dns";
-import { middlewareLoggedIn } from "./middleware";
+import { middlewareLoggedIn } from "./mw";
 dns.setDefaultResultOrder("ipv4first");
 
 async function main() {

@@ -14,20 +14,14 @@ export async function createFeedFollow(feed_id:any, user_id:any) {
 
 
 export async function getFeedFollowsForUser(user_id:any) {
-  try{
-    const result = await db
-    .select({
-      feedName: feeds.name,
-    }).from(feed_follows)
-    .innerJoin(feeds, eq(feed_follows.feed_id, feeds.id))
-    .innerJoin(users, eq(feed_follows.user_id, users.id))
-    .where(eq(feed_follows.user_id, user_id));
-    return result
-
-  } catch(e){
-    throw Error("FeedFollow already exists!")
-  }
- 
+  const result = await db
+  .select({
+    feedName: feeds.name,
+  }).from(feed_follows)
+  .innerJoin(feeds, eq(feed_follows.feed_id, feeds.id))
+  .innerJoin(users, eq(feed_follows.user_id, users.id))
+  .where(eq(feed_follows.user_id, user_id));
+  return result;
 }
 
 

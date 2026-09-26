@@ -60,7 +60,7 @@ export async function handlerLogin(cmdName: string, ...args: string[]){
 
 export async function handlerRegister(cmdName: string, ...args: string[]){
     if(args.length === 0)
-        throw new Error("the login handler expects a single argument, the username")
+        throw new Error("the register handler expects a single argument, the username")
     await createUser(args[0])
     setUser(args[0])
     const user = await getUserByName(args[0])
@@ -120,7 +120,7 @@ export async function handlerAgg(cmdName: string, ...args: string[]){
 
 export async function handlerAddFeed(cmdName: string, user:User, ...args: string[]){
     if(args.length !== 2)
-        throw new Error("createfeed expects two arguments: name and url");
+        throw new Error("addfeed expects two arguments: name and url");
     
     const feed = await addFeed(args[0], args[1], user.id);
     if (!feed) throw new Error("Feed insert failed");
