@@ -1,6 +1,9 @@
+import { title } from "node:process";
 import { readConfig, setUser } from "./config";
+import { parseDuration } from "./core/helpers";
 import { createFeedFollow, deleteFeedFollow, getFeedFollowsForUser } from "./db/queries/feed_follows";
-import { addFeed, getFeedByUrl, getFeeds } from "./db/queries/feeds";
+import { addFeed, getFeedByUrl, getFeeds, getNextFeedToFetch, markFeedFetched } from "./db/queries/feeds";
+import { createPost, getPostsForUser } from "./db/queries/posts";
 import { clearUsers, createUser, getUserById, getUserByName, getUsers } from "./db/queries/users";
 import { Feed, User } from "./db/schema";
 import { fetchFeed } from "./rss";
@@ -94,12 +97,24 @@ export async function handlerListUsers(cmdName: string, ...args: string[]){
 
 
 export async function handlerAgg(cmdName: string, ...args: string[]){
+    if(args.length !== 1)
+        throw new Error("Expects 1 argument!");
 
-    const feed = await fetchFeed("https://www.wagslane.dev/index.xml")
-    if(feed)
-        console.log(JSON.stringify(feed, null, 2));
-    else
-        console.log("Something happened, retry later!")
+    const ms = parseDuration(args[0]);
+    console.log(`Collecting feeds every ${args[0]}`);
+    scrapeFeeds().catch((e) => console.error(e));
+
+    const interval = setInterval(() => {
+        scrapeFeeds().catch((e) => console.error(e));
+    }, ms);
+
+    await new Promise<void>((resolve) => {
+        process.on("SIGINT", () => {
+            console.log("Shutting down feed aggregator...");
+            clearInterval(interval);
+            resolve();
+        });
+    });
 }
 
 
@@ -180,6 +195,44 @@ export async function handlerDeleteFeedFollow(cmdName: string, user:User, ...arg
     const res = await deleteFeedFollow(feed_id, user_id)
 
     console.log(`Unfollowed ${feed.name}`);
+}
+
+
+export async function scrapeFeeds(){
+
+    const nextFeed = await getNextFeedToFetch()
+    const res = await fetchFeed(nextFeed.url)
+    await markFeedFetched(nextFeed.id)
+        
+    if(res){
+        const items = res.channel.item ?? [];
+        for(let item of items){
+            await createPost(
+                item.title,
+                item.link,
+                nextFeed.id,
+                item.pubDate ? new Date(item.pubDate) : null,
+                item.description ?? null
+            )
+        }
+    }
+    else
+        console.log("Something happened, retry later!")
+}
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - posts
+export async function handlerGetLatestUserPosts(cmdName: string, user:User, ...args: string[]){
+    const user_id = user.id
+    const limit = args[0] ? parseInt(args[0]) : 2;
+    const res = await getPostsForUser(user_id, limit)
+        
+    if(res)
+        for(let x of res){
+            console.log(x)
+        }
+    else
+        console.log("Something happened, retry later!")
 }
 
 
