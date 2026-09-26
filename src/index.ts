@@ -1,4 +1,4 @@
-import { CommandsRegistry, handlerAddFeed, handlerAgg, handlerListFeeds, handlerListUsers, handlerLogin, handlerRegister, handlerReset, runCommand } from "./command";
+import { CommandsRegistry, handlerAddFeed, handlerAgg, handlerCreateFeedFollow, handlerListFeedFollows, handlerListFeeds, handlerListUsers, handlerLogin, handlerRegister, handlerReset, runCommand } from "./command";
 import { readConfig, setUser } from "./config";
 
 
@@ -14,6 +14,8 @@ async function main() {
   cmdRegistrey['agg'] = handlerAgg
   cmdRegistrey['addfeed'] = handlerAddFeed
   cmdRegistrey['feeds'] = handlerListFeeds
+  cmdRegistrey['follow'] = handlerCreateFeedFollow
+  cmdRegistrey['following'] = handlerListFeedFollows
 
 
   const args = process.argv.slice(2);

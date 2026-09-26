@@ -1,5 +1,6 @@
 import { readConfig, setUser } from "./config";
-import { addFeed, getFeeds } from "./db/queries/feeds";
+import { createFeedFollow, getFeedFollowsForUser } from "./db/queries/feed_follows";
+import { addFeed, getFeedByUrl, getFeeds } from "./db/queries/feeds";
 import { clearUsers, createUser, getUserById, getUserByName, getUsers } from "./db/queries/users";
 import { Feed, User } from "./db/schema";
 import { fetchFeed } from "./rss";
@@ -113,9 +114,13 @@ export async function handlerAddFeed(cmdName: string, ...args: string[]){
         throw new Error("User not found");
     }
     
-    const feed = await addFeed(args[0], args[1], user.id)
+    const feed = await addFeed(args[0], args[1], user.id);
+    if (!feed) throw new Error("Feed insert failed");
 
-    helperPrintFeed(feed, user)
+    const follow = await createFeedFollow(feed.id, user.id);
+    if (!follow) throw new Error("Follow insert failed");
+
+    helperPrintFeed(follow.feedName, follow.userName);
 }
 
 
@@ -135,11 +140,61 @@ export async function handlerListFeeds(cmdName: string, ...args: string[]){
 }
 
 
+
+export async function handlerCreateFeedFollow(cmdName: string, ...args: string[]){
+    if(args.length === 0)
+        throw new Error("The handler expects a single argument!")
+
+    // feed_id
+    const feed = await getFeedByUrl(args[0]);
+    const feed_id = feed.id
+
+    // user_id
+    const config = readConfig()
+    if (!config.currentUserName) 
+        throw new Error("User does not exist!");
+    const user = await getUserByName(config.currentUserName);
+    if (!user)
+        throw new Error("User not found");
+    const user_id = user.id
+
+    // call
+    if(args.length === 0)
+        throw new Error("the handler expects a single argument!")
+    const res = await createFeedFollow(feed_id, user_id)
+
+    console.log("Done!", res?.feedName, res?.userName)
+}
+
+
+export async function handlerListFeedFollows(cmdName: string, ...args: string[]){
+    // if(args.length === 0)
+    //     throw new Error("the Reset handler expects a single argument")
+    // user_id
+    const config = readConfig()
+    if (!config.currentUserName) 
+        throw new Error("User does not exist!");
+    const user = await getUserByName(config.currentUserName);
+    if (!user)
+        throw new Error("User not found");
+    const user_id = user.id
+
+    const res = await getFeedFollowsForUser(user_id)
+        
+    if(res)
+        for(let x of res){
+            console.log(x.feedName)
+        }
+    else
+        console.log("Something happened, retry later!")
+}
+
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - helpers
 
 
-export async function helperPrintFeed(feed: Feed, user: User){
-    if(!feed || ! user)
+export async function helperPrintFeed(feed: string, user: string){
+    if(!feed || !user)
         throw new Error("failed to print, feed or user equal null")
     
     console.log(feed, user)
