@@ -40,7 +40,7 @@ The current user is a name stored in the config file on this machine. Commands t
 | Post | Each post belongs to one feed (`posts.feed_id`). Post URLs are unique across the whole table. Posts are not stored per user. |
 | Read path | `browse` uses the current user's follows. `agg` reads the whole `feeds` table and fetches one stored feed per tick. |
 
-<hr>
+<br>
 
 <h3 id="about-code">🧩 What the code is doing</h3>
 
@@ -77,7 +77,7 @@ Imports run before the body of `src/index.ts`. `readConfig()` runs during that i
 
 Run these steps from the project directory. The examples use `npm start --` so npm forwards the arguments to the script.
 
-<hr>
+<br>
 
 <h3 id="config-install">📦 1. Install</h3>
 
@@ -85,7 +85,7 @@ Run these steps from the project directory. The examples use `npm start --` so n
 npm install
 ```
 
-<hr>
+<br>
 
 <h3 id="config-migrate">🛠️ 2. Create the database and migrate</h3>
 
@@ -107,7 +107,7 @@ Replace `USER`, `PASSWORD`, and `DATABASE_NAME` with your own values. A bare ass
 
 `npm run generate` runs `drizzle-kit generate` against `src/db/schema.ts`. It writes a new SQL file when the schema differs from the last snapshot in `src/db/migrations/meta/`. The SQL files for a first run are already in the repository. You do not need `generate` to boot.
 
-<hr>
+<br>
 
 <h3 id="config-file">📝 3. Write the config file</h3>
 
@@ -127,7 +127,7 @@ When Node runs on Windows, the file is in the Windows user profile. A `.gatorcon
 
 `current_user_name` is optional when you write the file by hand. The program does not check that this field is a string. `register` and `login` are the only commands that write the file. `setUser` returns without writing when the username length is `0`. After a non-empty name is written, `writeConfig` replaces the file with only `db_url` and `current_user_name`, indented with two spaces. Any other key you added by hand is dropped on that write. Keep the file on your machine.
 
-<hr>
+<br>
 
 <h3 id="config-run">🚀 4. Run a few commands</h3>
 
@@ -181,7 +181,7 @@ Logged-in commands are `addfeed`, `follow`, `following`, `unfollow`, and `browse
 
 Jump to a command: [🔐 login](#cmd-login) · [✨ register](#cmd-register) · [🧹 reset](#cmd-reset) · [👥 users](#cmd-users) · [⏱️ agg](#cmd-agg) · [➕ addfeed](#cmd-addfeed) · [📃 feeds](#cmd-feeds) · [👉 follow](#cmd-follow) · [📋 following](#cmd-following) · [👋 unfollow](#cmd-unfollow) · [👀 browse](#cmd-browse)
 
-<hr>
+<br>
 
 <h3 id="cmd-login">🔐 login</h3>
 
@@ -197,7 +197,7 @@ Looks up the first argument. A found row calls `setUser`, then prints the succes
 
 An empty-string argument has `args.length === 1`, so the "single argument" error does not run. `getUserByName("")` runs first. When that row is missing, the command throws `User does not exist!` and does not write the file. When a user named `""` already exists, `setUser` returns without writing, and the command still prints `User has been set!`.
 
-<hr>
+<br>
 
 <h3 id="cmd-register">✨ register</h3>
 
@@ -215,7 +215,7 @@ Inserts one row, then always calls `setUser` with the same argument. `setUser` w
 
 User names are unique. The handler does not check length before the insert. A successful insert of a zero-length name still calls `setUser`, and `setUser` then returns without writing.
 
-<hr>
+<br>
 
 <h3 id="cmd-reset">🧹 reset</h3>
 
@@ -232,7 +232,7 @@ Deletes every row in `users`. There is no `WHERE` clause. The handler does not d
 
 The migration foreign keys use `ON DELETE cascade` and `ON UPDATE no action`. Deleting a user deletes that user's feeds and follow rows. Deleting a feed deletes its posts and its follow rows. After `reset`, `current_user_name` is still in the config file, and no user rows remain. `login` with that old name throws `User does not exist!`. `register` can insert the name again. `login` writes a name only when that row already exists. A logged-in command for a config name with no row throws `User not found`.
 
-<hr>
+<br>
 
 <h3 id="cmd-users">👥 users</h3>
 
@@ -245,7 +245,7 @@ Prints one name per line. The name that equals `current_user_name` is printed as
 | Empty table | No lines |
 | Config name with no matching row | No line gets ` (current)` |
 
-<hr>
+<br>
 
 <h3 id="cmd-agg">⏱️ agg</h3>
 
@@ -272,7 +272,7 @@ Each tick selects one row from every feed in the table: `ORDER BY last_fetched_a
 
 Fetch details, including what a duplicate post URL does, are in [📡 Scraping](#scrape).
 
-<hr>
+<br>
 
 <h3 id="cmd-addfeed">➕ addfeed</h3>
 
@@ -292,7 +292,7 @@ The name you pass is stored as `feeds.name`. The RSS channel title is not read h
 
 `addFeed` catches every insert error and throws `Feed already exists!`. A connection failure gets that same message. Feed URLs are unique. Feed names are not. A second follow of the same feed by the same user fails in `createFeedFollow` with the driver's unique-violation error. That function does not replace the driver error. It throws `Insert failed` only when the insert returns no row.
 
-<hr>
+<br>
 
 <h3 id="cmd-feeds">📃 feeds</h3>
 
@@ -305,7 +305,7 @@ Prints every feed as three `console.log` arguments: feed name, feed URL, and the
 | Empty table | No lines |
 | Owner row missing | TypeError: `Cannot read properties of undefined (reading 'name')` |
 
-<hr>
+<br>
 
 <h3 id="cmd-follow">👉 follow</h3>
 
@@ -322,7 +322,7 @@ Loads the feed by the first argument, then inserts a follow for the current user
 
 A second `args.length === 0` check later in the handler is unreachable. Its message is `the handler expects a single argument!`, with a lowercase `the`. The check that runs uses `The handler expects a single argument!`.
 
-<hr>
+<br>
 
 <h3 id="cmd-following">📋 following</h3>
 
@@ -334,7 +334,7 @@ Prints the feed name for each follow of the current user, one name per line. The
 | Arguments | Ignored |
 | Empty list | No lines |
 
-<hr>
+<br>
 
 <h3 id="cmd-unfollow">👋 unfollow</h3>
 
@@ -350,7 +350,7 @@ Loads the feed by the first argument, deletes the follow for the current user an
 
 Extra arguments are ignored. A second `args.length === 0` check later in the handler is unreachable. Its message is `the handler expects a single argument!`, with a lowercase `the`. The check that runs uses `The handler expects a single argument!`.
 
-<hr>
+<br>
 
 <h3 id="cmd-browse">👀 browse</h3>
 
@@ -376,7 +376,7 @@ The query joins `posts` to `feeds` to `feed_follows` and keeps rows whose follow
 
 `scrapeFeeds` in `src/command.ts` loads the next feed, fetches it, marks it fetched, then inserts items. `fetchFeed` in `src/rss/index.ts` does the HTTP request and the XML read.
 
-<hr>
+<br>
 
 <h3 id="scrape-request">🌐 Request</h3>
 
@@ -391,7 +391,7 @@ These `fast-xml-parser` defaults stay on because the code does not set them:
 | `parseTagValue: true` | Numeric-looking text can become a number before the checks below. |
 | `processEntities` | Overridden to `false` by this program. |
 
-<hr>
+<br>
 
 <h3 id="scrape-feed">📥 What counts as a feed</h3>
 
@@ -418,7 +418,7 @@ An item is kept only when `title`, `link`, `description`, and `pubDate` are all 
 
 `pubDate` is not checked with `Number.isNaN(date.getTime())`. The `pubDate ? ... : null` expression in `scrapeFeeds` does not see items the filter already dropped, because those items have no `pubDate`. The same is true of `description ?? null`.
 
-<hr>
+<br>
 
 <h3 id="scrape-save">💾 Save order</h3>
 
@@ -454,7 +454,7 @@ Timestamps in the migrations are `timestamp` without time zone. Each `id` defaul
 | `0003_natural_deadpool.sql` | Adds nullable `feeds.last_fetched_at` |
 | `0004_quick_shockwave.sql` | Creates `posts` with unique `url` and `posts.feed_id` referencing `feeds.id` `ON DELETE cascade` `ON UPDATE no action` |
 
-<hr>
+<br>
 
 <h3 id="db-users">👤 users</h3>
 
@@ -465,7 +465,7 @@ Timestamps in the migrations are `timestamp` without time zone. Each `id` defaul
 | `updated_at` | `timestamp`, default `now()`, not null |
 | `name` | `text`, not null, unique |
 
-<hr>
+<br>
 
 <h3 id="db-feeds">🗂️ feeds</h3>
 
@@ -479,7 +479,7 @@ Timestamps in the migrations are `timestamp` without time zone. Each `id` defaul
 | `url` | `text`, unique. Nullable in `0001`, then `NOT NULL` in `0002`. |
 | `user_id` | `uuid`, not null, references `users.id` `ON DELETE cascade` `ON UPDATE no action` |
 
-<hr>
+<br>
 
 <h3 id="db-follows">🔗 feed_follows</h3>
 
@@ -492,7 +492,7 @@ Timestamps in the migrations are `timestamp` without time zone. Each `id` defaul
 | `user_id` | `uuid`, not null, references `users.id` `ON DELETE cascade` `ON UPDATE no action` |
 | Unique | `(feed_id, user_id)` named `feed_follows_feed_user_unique` |
 
-<hr>
+<br>
 
 <h3 id="db-posts">📄 posts</h3>
 
